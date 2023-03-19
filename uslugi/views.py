@@ -173,7 +173,14 @@ def usluga(request):
 
 
         return render(request,'uslugi/usluga.html',{'ds':ds,'stand':stand})
-                    
+    
+    elif vmes != v_serv:
+        stand=[]
+        text = "стандарт "+ vmes[0][0] + ', но он отсутсвует в справочнике SPSERVSTANDARD, используйте приказ 168'
+        
+        stand.append(text)
+        return render(request,'uslugi/usluga.html',{'stand':stand})
+
     else:
         stand=[]
         print(" нет в базе ДН с таким диагнозом ")
