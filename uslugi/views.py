@@ -160,7 +160,7 @@ def usluga(request):
             w = True
             for k in v_serv:
                 
-                if elem == k[0] and k[4] == '1':
+                if elem == k[0]:
                     #print(k[6],k[7])
                     if w:
                         text += '\n<h4>комментарий:\n</h4>'+ k[8]
