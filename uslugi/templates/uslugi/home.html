@@ -25,6 +25,19 @@
 
     </form>
 
+    <br>
+    <h2>Ниже тут можно ввести код МЭС для проверки услуг</h2>
+    <br>
+    <form action="{% url 'uslmes' %}">
+
+        <h5><label for="name">код МЭС:  </label>
+        <input type="text" name="mes" placeholder="76-2-1" id="mes" required></h5>
+        <br>
+        <br>
+        <input type="submit" value="Посмотреть" class="btn btn-primary">
+
+    </form>
+
 </div>
 <br>
 <br>

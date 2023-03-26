@@ -20,4 +20,5 @@ from uslugi import views
 urlpatterns = [
     path('', views.home, name='home'),
     path('standart', views.usluga, name='usluga'),
+    path('uslmes', views.mes_usl, name='uslmes'),
 ]
