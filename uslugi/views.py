@@ -201,14 +201,14 @@ def mes_usl(request):
 
     mes_medserv =[]
     stand =[]
+    mes_name = ''
 
-
-    
     for irec in REC:
     
         if (mes == str(irec[0])):
             #[irec.getAttribute("MEDSTANDARD"), irec.getAttribute("DIVISION"), irec.getAttribute("MEDSERVICE"), irec.getAttribute("MUSTHAVE")]
             a= [irec[0], irec[1], irec[2], irec[3]]
+            mes_name = irec[4]
             mes_medserv.append(a)
             
     if mes_medserv == []:
@@ -296,4 +296,4 @@ def mes_usl(request):
             
         stand.append(text)
         
-    return render(request,'uslugi/uslmes.html',{'stand':stand})
+    return render(request,'uslugi/uslmes.html',{'stand':stand, 'mes_name':mes_name})
