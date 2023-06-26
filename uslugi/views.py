@@ -8,81 +8,56 @@ def home(request):
 def usluga(request):
     ds1 = request.GET.get('code')
     ds = ds1.replace(" ","").upper() # удалим пробелы и переведем вверхний регистр
-
-    #stand ="654685"
-    #return render(request,'uslugi/usluga.html',{'ds':ds, 'st':stand})
     
     con = sqlite3.connect('mes_mkb.db') # подключимся базе данных 
     sql = con.cursor()
-    sql.execute("SELECT * FROM SPDISPMKB") # запросим все элементы из таблицы 
-    baza_disp_mkb = sql.fetchall() # получаем все записи из базы данных, используя метод cursor.fetchall()
+
+    sql.execute("SELECT * FROM mes") # запросим все элементы из таблицы 
+    mes_tab = sql.fetchall() # получаем все записи из базы данных, используя метод cursor.fetchall()
+    # mes_tab = [ 76-1-1, теравепт, МКБ1, МКБ2, 100, периодичность, коммент]
 
     sql.execute("SELECT * FROM mkb10") # запросим все элементы из таблицы 
     baza_mkb = sql.fetchall() # получаем все записи из базы данных, используя метод cursor.fetchall()
 
     con.close() # закрываем базу
-    
-    
 
-    vidmes =[]
+    vidimes =[]
 
-    for n in baza_disp_mkb: # пройдемся по базе дисп
+    for n in mes_tab: # пройдемся по базе дисп
         dian =[]
         a = 0
         for k in baza_mkb: # пройдемся по базе мкб, ищем совпадения
-            if k[0] == n[0]: # начало диапазона
+            if k[0] == n[2]: # начало диапазона
                 a = 1
             if a == 1:
                 dian.append(k[0])
-            if k[0] == n[1]: # конец диапазона
+            if k[0] == n[3]: # конец диапазона
                 a = 0
                 continue
         for j in dian: # сохраним диапазон
             if ds == j:
-                vidmes.append(n) # хранить данные как SPDISPMKB: MKB1 , MKB2 ,DISPD ,PERIOD ,COMM 
+                vidimes.append(n) # хранить данные как : [ 76-1-1, теравепт, МКБ1, МКБ2, 100, периодичность, коммент]
 
 
-
-
-    vmes =[] # ['76-1-2', '100', 'врач-терапевт', '2',COMM]
-
-
-    bd = sqlite3.connect('mes_mkb.db') # подключимся базе данных 
-    sql = bd.cursor()
-    sql.execute("SELECT * FROM mes") # запросим все элементы из таблицы 
-    a = sql.fetchall() # получаем все записи из базы данных, используя метод cursor.fetchall()
-    bd.close() # закрываем базу
-
-    for n in vidmes:
-        # ['76-1-34', '100', 'врач-терапевт', '2']
-        for j in a:
-            #print(type(n[0]),type(j[2]),type(n[1]),type(j[3]),type(n[2]),type(j[4]))
-            if (n[0] == j[2]) and (n[1] == j[3]) and (n[2] == j[4]):
-                ans = [j[0],j[4],j[1],n[3],n[4]] # МЭС, КОД ВРАЧА (100), НАЗВАНИЕ ВРАЧА, ПЕРИОДИЧНОСТЬ ПОСЕЩЕНИЯ В ГОД,COMM
-                vmes.append(ans)
-            
-
-    vidmes.clear()
 
     con = sqlite3.connect('mes_mkb.db') # подключимся базе данных 
     sql = con.cursor()
     sql.execute("SELECT * FROM SPSERVSTANDARD") # запросим все элементы из таблицы 
-    REC = sql.fetchall() # получаем все записи из базы данных, используя метод cursor.fetchall()
+    SPSERVSTANDARD = sql.fetchall() # получаем все записи из базы данных, используя метод cursor.fetchall()
     con.close()
 
     mes_medserv =[]
     v_serv =[]
 
-    for n in vmes:
-        for irec in REC:
+    for n in vidimes:  # хранить данные как : [ 76-1-1, теравепт, МКБ1, МКБ2, 100, периодичность, коммент]
+        for irec in SPSERVSTANDARD:
         
             if (n[0] == irec[0]):
-                #a2 = [irec.getAttribute("MEDSTANDARD"), irec.getAttribute("DIVISION"), irec.getAttribute("MEDSERVICE"), irec.getAttribute("MUSTHAVE"), n[1],n[2],n[3]]
-                a2 = [irec[0], irec[1], irec[2], irec[3], n[1],n[2],n[3],n[4]]
-                #v_serv.append(a2)
-                mes_medserv.append(a2)
+                
+                a2 = [irec[0], irec[1], irec[2], irec[3], n[1],n[5],n[6],irec[4]]
+                
+                mes_medserv.append(a2) # [ 76-1-1  0, дивизион 1, код услуги 2, мастхев 3, теравепт 4, периодичность 5, коммент 6, имя МЭС 7]
   
-    v_serv.clear()
 
     if mes_medserv != v_serv:
 
@@ -90,16 +65,17 @@ def usluga(request):
         sql = con.cursor()
         sql.execute("SELECT * FROM SPMEDSERVICE") # запросим все элементы из таблицы 
         RECsv = sql.fetchall() # получаем все записи из базы данных, используя метод cursor.fetchall()
+        # RECsv = [code 0, division 1, name 2]
         con.close()
 
         for irec in RECsv:
             for chil in mes_medserv:
                 
-                if chil[2] == irec[0] and irec[1] == chil[1]:
+                if chil[2] == irec[0] and chil[1] == irec[1]:
 
-                    #25-1-3, 200[врач], кардиолог, 301[дивизион], 1[MUSTHAVE], 2[периодичность], B03.016.002.999, клинический анализ крови, COMM
-                    # 0        1          2           3               4           5                   6              7                       8
-                    ans = [chil[0],chil[4],chil[5],chil[1],chil[3],chil[6],irec[0],irec[2],chil[7]]
+                    #25-1-3, имя МЭС , кардиолог, 301[дивизион], [MUSTHAVE], [периодичность], B03.016.002.999, клинический анализ крови, COMM
+                    # 0        1          2           3               4           5                   6              7                    8
+                    ans = [chil[0],chil[7],chil[4],chil[1],chil[3],chil[5],irec[0],irec[2],chil[6]]
                     v_serv.append(ans)
                     
         stan =[] # будем хранить стандаты по текушему диагнозу  типа 76-1-5
@@ -109,22 +85,24 @@ def usluga(request):
             if elem[0] not in stan:
                 stan.append(elem[0])
 
-        stan.reverse()
+        # stan.reverse()
         stand =[]
-
+        #--------------------------------------------------------------------------------------------------
         for elem in stan: 
 
             text =''
             profil =''
             period =''
+            mes_name =''
             
             for k in v_serv:
                 if elem == k[0]:
                     profil = k[2]
                     period = k[5]
+                    mes_name = k[1]
 
            
-            text += "<h4>СТАНДАРТ (МЭС) : " +elem +'\nПРОФИЛЬ : '+ profil+'\n'+'периодичность : '+ period+'  раз(а) в год\n' +"предусмотрены следующие обязательные услуги:</h4>"
+            text += "<h4>СТАНДАРТ (МЭС) : " +elem + "   Наименование: " + mes_name +'\nПРОФИЛЬ : '+ profil+'\n'+'периодичность : '+ period+'  раз(а) в год\n' +"предусмотрены следующие обязательные услуги:</h4>"
            
 
             for k in v_serv:
@@ -174,9 +152,9 @@ def usluga(request):
 
         return render(request,'uslugi/usluga.html',{'ds':ds,'stand':stand})
     
-    elif vmes != v_serv:
+    elif vidimes != v_serv:
         stand=[]
-        text = "стандарт "+ vmes[0][0] + ', но он отсутсвует в справочнике SPSERVSTANDARD, используйте приказ 168'
+        text = "стандарт "+ vidimes[0][0] + ', но он отсутсвует в справочнике SPSERVSTANDARD, используйте приказ 168'
         
         stand.append(text)
         return render(request,'uslugi/usluga.html',{'stand':stand})
