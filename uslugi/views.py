@@ -8,7 +8,16 @@ def home(request):
 def usluga(request):
     ds1 = request.GET.get('code')
     ds = ds1.replace(" ","").upper() # удалим пробелы и переведем вверхний регистр
-    
+    ds = ds.replace("С","C") # русская "С" на англискую
+    ds = ds.replace("К","K") # русская "К" на англискую
+    ds = ds.replace("Н","H")
+    ds = ds.replace("О","O")
+    ds = ds.replace("М","M")
+    ds = ds.replace("Р","P")
+    ds = ds.replace("Е","E")
+    ds = ds.replace(",",".")
+    ds = ds.replace("/",".")
+
     con = sqlite3.connect('mes_mkb.db') # подключимся базе данных 
     sql = con.cursor()
 
@@ -90,7 +99,7 @@ def usluga(request):
         #--------------------------------------------------------------------------------------------------
         for elem in stan: 
 
-            text =''
+            text = ''
             profil =''
             period =''
             mes_name =''
@@ -104,28 +113,39 @@ def usluga(request):
            
             text += "<h4>СТАНДАРТ (МЭС) : " +elem + "   Наименование: " + mes_name +'\nПРОФИЛЬ : '+ profil+'\n'+'периодичность : '+ period+'  раз(а) в год\n' +"предусмотрены следующие обязательные услуги:</h4>"
            
-
-            for k in v_serv:
-                if elem == k[0] and k[4] == '1':
-                    #print(k[6],k[7])
-                    text += "- " + k[6] +"  "+ k[7] +'\n'
-                    
-        
-            #print("\nИ ЧТО-ТО ИЗ ЭТОГО:")
-            
             w = True
             for k in v_serv:
-                
-                if elem == k[0] and k[4] == '2':
-                    #print(k[6],k[7])
-                    if w:
-                        text +="\n<h4>а так же обязательно необходима одна из услуг из этого списка:</h4>"
-                        w = False
+                if elem == k[0] and k[4] == '1':
+                    w = False
                     text += "- " + k[6] +"  "+ k[7] +'\n'
+                
+            if w:
+                text += 'смотри ниже\n'     
                     
-
-            #print("\nИ МОЖНО ДОПОЛНИТЕЛЬНО:")
+        
+            def must_blok(array,index_musthave):
+                text1 =""
+                w = True
+                for k in array:
+                    
+                    if elem == k[0] and k[4] == str(index_musthave):
+                       
+                        if w:
+                            text1 +="\n<h4>а так же обязательно необходима одна из услуг из этого блока:</h4>"
+                            w = False
+                        text1 += "- " + k[6] +"  "+ k[7] +'\n'
+                return text1
             
+            text += must_blok(v_serv,2)
+            text += must_blok(v_serv,3)
+            text += must_blok(v_serv,4)
+            text += must_blok(v_serv,5)
+            text += must_blok(v_serv,6)
+            text += must_blok(v_serv,7)
+            text += must_blok(v_serv,8)
+            text += must_blok(v_serv,9)
+            text += must_blok(v_serv,10)
+
             w = True
             for k in v_serv:
                 if elem == k[0] and k[4] == '0':
@@ -240,20 +260,32 @@ def mes_usl(request):
                 
     
         #print("\nИ ЧТО-ТО ИЗ ЭТОГО:")
-        
-        w = True
-        for k in serv_usl:
-            
-            if elem == k[0] and k[2] == '2':
-                
-                if w:
-                    text +="\n<h4>а так же обязательно необходима одна из услуг из этого списка:</h4>"
-                    w = False
-                text += "- " + k[3] +"  "+ k[4] +'\n'
-                
 
-        #print("\nИ МОЖНО ДОПОЛНИТЕЛЬНО:")
+        def must_blok(array,index_musthave):
+                text1 =""
+                w = True
+                
+                for k in array:
+                    
+                    if elem == k[0] and k[2] == str(index_musthave):
+                        
+                        if w:
+                            text1 +="\n<h4>а так же обязательно необходима одна из услуг из этого блока:</h4>"
+                            w = False
+                        text1 += "- " + k[3] +"  "+ k[4] +'\n'
+                return text1
         
+        text += must_blok(serv_usl,2)
+        text += must_blok(serv_usl,3)
+        text += must_blok(serv_usl,4)
+        text += must_blok(serv_usl,5)
+        text += must_blok(serv_usl,6)
+        text += must_blok(serv_usl,7)
+        text += must_blok(serv_usl,8)
+        text += must_blok(serv_usl,9)
+        text += must_blok(serv_usl,10)
+        
+        #print("\nИ МОЖНО ДОПОЛНИТЕЛЬНО:")
         w = True
         for k in serv_usl:
             if elem == k[0] and k[2] == '0':
@@ -263,15 +295,7 @@ def mes_usl(request):
                     w = False
                 text += "- " + k[3] +"  "+ k[4] +'\n'
         
-        w = True
-        for k in serv_usl:
-            if elem == k[0] and k[2] == '4':
-
-                if w:
-                    text +="\n<h4>а так же не понятные услуги из этого списка, где MUSTHAVE = 4 :</h4>"
-                    w = False
-                text += "- " + k[3] +"  "+ k[4] +'\n'
-            
+        
         stand.append(text)
         
     return render(request,'uslugi/uslmes.html',{'stand':stand, 'mes_name':mes_name})

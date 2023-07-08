@@ -16,9 +16,13 @@ Including another URLconf
 #from django.contrib import admin
 from django.urls import path
 from uslugi import views
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('', views.home, name='home'),
     path('standart', views.usluga, name='usluga'),
     path('uslmes', views.mes_usl, name='uslmes'),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, documment_root = settings.MEDIA_ROOT)
