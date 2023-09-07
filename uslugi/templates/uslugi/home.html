@@ -42,7 +42,7 @@
     </form>
 
     <br>
-    <h2>Ниже тут можно ввести код МЭС для проверки услуг</h2>
+    <h2>Ниже тут можно ввести код МЭС (стандарт) для проверки услуг</h2>
     <br>
     <form action="{% url 'uslmes' %}">
 
@@ -53,11 +53,21 @@
         <input type="submit" value="Посмотреть" class="btn btn-primary">
 
     </form>
+    <br>
+    <h2>Проверить стандарт по дивизиону:</h2>
+    <br>
+    <form action="{% url 'info' %}">
+
+        <h5><label for="name">код МЭС:  </label>
+        <input type="text" name="mes" placeholder="76-1-7" id="mes" required></h5>
+        <br>
+        <br>
+        <input type="submit" value="Проверить" class="btn btn-primary">
+
+    </form>
 
 </div>
-<br>
-<br>
-<br>
+
 <br>
 <div>Приложение работает в тестовом режиме!</div>
 <div>Если найдете ошибки, пожалуйста напишите сюда: it-ural5@mail.ru</div>

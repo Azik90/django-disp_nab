@@ -299,3 +299,132 @@ def mes_usl(request):
         stand.append(text)
         
     return render(request,'uslugi/uslmes.html',{'stand':stand, 'mes_name':mes_name})
+
+
+def info(request):
+    mes1 = request.GET.get('mes')
+    mes = str(mes1.replace(" ","")) # удалим пробелы
+    print(mes)
+ 
+    con = sqlite3.connect('mes_mkb.db') # подключимся базе данных 
+    sql = con.cursor()
+    sql.execute("SELECT * FROM SPSERVSTANDARD") # запросим все элементы из таблицы 
+    REC = sql.fetchall() # получаем все записи из базы данных, используя метод cursor.fetchall()
+    con.close()
+
+    mes_medserv =[]
+    stand =[]
+    mes_name = ''
+
+    for irec in REC:
+    
+        if (mes == str(irec[0])):
+            #[irec.getAttribute("MEDSTANDARD"), irec.getAttribute("DIVISION"), irec.getAttribute("MEDSERVICE"), irec.getAttribute("MUSTHAVE")]
+            a= [irec[0], irec[1], irec[2], irec[3]]
+            mes_name = irec[4]
+            mes_medserv.append(a)
+            
+    if mes_medserv == []:
+        print(" нет в базе ДН с таким диагнозом ")
+        text ='В спавочнике отсутствует такой МЭС или Вы не правильно ввели код МЭС'
+        stand.append(text)
+        return render(request,'uslugi/uslmes.html',{'stand':stand})
+            
+  
+
+    con = sqlite3.connect('mes_mkb.db') # подключимся базе данных 
+    sql = con.cursor()
+    sql.execute("SELECT * FROM SPMEDSERVICE") # запросим все элементы из таблицы 
+    RECsv = sql.fetchall() # получаем все записи из базы данных, используя метод cursor.fetchall()
+    con.close()
+
+    serv_usl=[]    
+    for irec in RECsv:
+        for k in mes_medserv:
+     
+            if k[2] == irec[0] and irec[1] == k[1]:
+
+                #25-1-3, 301[дивизион], 1[MUSTHAVE],  B03.016.002.999, клинический анализ крови, 
+                # 0        1               2               3               4                                              
+                ans = [k[0],k[1],k[3],irec[0],irec[2]]
+                #print(ans) ['76-1-1', '300', '2', 'B04.047.001', 'Прием (осмотр, консультация) врача-терапевта диспансерный']
+                serv_usl.append(ans)
+    #print(serv_usl)        
+                
+    stan =[] # будем хранить стандаты по текушему диагнозу  типа 76-1-5
+
+    for elem in serv_usl:
+
+        if elem[0] not in stan:
+            stan.append(elem[0])
+
+    stan.reverse()
+    
+
+    for elem in stan: 
+
+        text =''
+
+        text += "<h4>СТАНДАРТ (МЭС) : " +elem + " предусмотрены следующие обязательные услуги [MUSTHAVE=1]:</h4>"
+        
+
+        for k in serv_usl:
+            if elem == k[0] and k[2] == '1':
+              
+                text += "DIVIZION: " + k[1] +" || - " + k[3] +"  "+ k[4] +'\n'
+                
+    
+        #print("\nИ ЧТО-ТО ИЗ ЭТОГО:")
+
+        def must_blok(array,index_musthave):
+                text1 =""
+                w = True
+                
+                for k in array:
+                    
+                    if elem == k[0] and k[2] == str(index_musthave):
+                        
+                        if w:
+                            text1 +=f"\n<h4>а так же обязательно необходима одна из услуг из этого блока [MUSTHAVE={index_musthave}]:</h4>"
+                            w = False
+                        text1 += "DIVIZION: " + k[1] + " || - " + k[3] +"  "+ k[4] +'\n'
+                return text1
+        
+        text += must_blok(serv_usl,2)
+        text += must_blok(serv_usl,3)
+        text += must_blok(serv_usl,4)
+        text += must_blok(serv_usl,5)
+        text += must_blok(serv_usl,6)
+        text += must_blok(serv_usl,7)
+        text += must_blok(serv_usl,8)
+        text += must_blok(serv_usl,9)
+        text += must_blok(serv_usl,10)
+        
+        #print("\nИ МОЖНО ДОПОЛНИТЕЛЬНО:")
+        w = True
+        for k in serv_usl:
+            if elem == k[0] and k[2] == '0':
+
+                if w:
+                    text +="\n<h4>кроме того, можно дополнительно оказать услуги из этого списка:</h4>"
+                    w = False
+                text += "DIVIZION: " + k[1] + " || - " + k[3] +"  "+ k[4] +'\n'
+        
+        
+        stand.append(text)
+
+    con = sqlite3.connect('mes_mkb.db') # подключимся базе данных 
+    sql = con.cursor()
+    sql.execute("SELECT * FROM SPSTANDARDGR") # запросим все элементы из таблицы 
+    spstgr = sql.fetchall() # получаем все записи из базы данных, используя метод cursor.fetchall()
+    con.close()
+
+    for k in spstgr:
+        if str(k[0]) == str(mes):
+            kol300min = k[1]
+            kol300max = k[2]
+            kol301min = k[3]
+            kol301max = k[4]
+        
+    return render(request,'uslugi/info.html',{'stand':stand, 'mes_name':mes_name, 'kol300min':kol300min, 'kol300max':kol300max,
+                                                 'kol301min':kol301min, 'kol301max':kol301max})
