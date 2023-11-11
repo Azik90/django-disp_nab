@@ -24,6 +24,7 @@ urlpatterns = [
     path('standart', views.usluga, name='usluga'),
     path('uslmes', views.mes_usl, name='uslmes'),
     path('info', views.info, name='info'),
+    path('llo', views.llo, name='llo'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, documment_root = settings.MEDIA_ROOT)

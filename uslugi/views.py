@@ -428,3 +428,17 @@ def info(request):
         
     return render(request,'uslugi/info.html',{'stand':stand, 'mes_name':mes_name, 'kol300min':kol300min, 'kol300max':kol300max,
                                                  'kol301min':kol301min, 'kol301max':kol301max})
+
+def llo(request):
+    con = sqlite3.connect('mes_mkb.db') # подключимся базе данных 
+    sql = con.cursor()
+    sql.execute("""SELECT MEDSTANDARD, NAME
+        FROM SPSERVSTANDARD
+        where MEDSTANDARD like 'PLT%'
+        group by  MEDSTANDARD,NAME
+        order by NAME""") # запросим все элементы из таблицы 
+    REC = sql.fetchall() # получаем все записи из базы данных, используя метод cursor.fetchall()
+    con.close()
+   
+
+    return render(request,'uslugi/llo.html',{'mes_name':REC})

@@ -27,48 +27,82 @@
 
 <div class="container-fluid text-center">
 
-    <h1>Диспансерное наблюдение в соответствии с Приказом Минздрава РФ от 15.03.2022 N 168Н для Свердловской области</h1>
-
-    <h2></h2>
-    <br>
-    <form action="{% url 'usluga' %}">
-
-        <h5><label for="name">Диагноз ДН:  </label>
-        <input type="text" name="code" placeholder="I11.9" id="code" required></h5>
-        <br>
-        <br>
-        <input type="submit" value="Проверить" class="btn btn-primary">
-
-    </form>
+    <h1 class="alert alert-dark">Диспансерное наблюдение и стандарты ЛЛО по ТФОМС [Свердловская область]</h1>
 
     <br>
-    <h2>Ниже тут можно ввести код МЭС (стандарт) для проверки услуг</h2>
-    <br>
-    <form action="{% url 'uslmes' %}">
+    
+    <div class="container overflow-hidden text-center">
+        <div class="row gy-5">
+          <div class="col-6">
+            <div class="p-3 alert alert-success">
 
-        <h5><label for="name">код МЭС:  </label>
-        <input type="text" name="mes" placeholder="76-2-1" id="mes" required></h5>
-        <br>
-        <br>
-        <input type="submit" value="Посмотреть" class="btn btn-primary">
+                <form action="{% url 'usluga' %}">
 
-    </form>
-    <br>
-    <h2>Проверить стандарт по дивизиону:</h2>
-    <br>
-    <form action="{% url 'info' %}">
+                    <h5><label for="name">Диагноз ДН:  </label>
+                    <input type="text" name="code" placeholder="I11.9 и др." id="code" required></h5>
+                    <br>
+                    <br>
+                    <input type="submit" value="Проверить" class="btn btn-primary">
+            
+                </form>
 
-        <h5><label for="name">код МЭС:  </label>
-        <input type="text" name="mes" placeholder="76-1-7" id="mes" required></h5>
-        <br>
-        <br>
-        <input type="submit" value="Проверить" class="btn btn-primary">
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-3 alert alert-success">
 
-    </form>
+                <h3>Содержание услуг в МЭС (стандарте)</h3>
+                <br>
+                <form action="{% url 'uslmes' %}">
+
+                    <h5><label for="name">код МЭС:  </label>
+                    <input type="text" name="mes" placeholder="76-2-1 или 6509 и др." id="mes" required></h5>
+                    <br>
+                    <br>
+                    <input type="submit" value="Посмотреть" class="btn btn-primary">
+
+                </form>
+
+
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-3 alert alert-success">
+
+                <h3>МЭС (стандарт) по дивизиону</h3>
+                <br>
+                <form action="{% url 'info' %}">
+
+                    <h5><label for="name">код МЭС:  </label>
+                    <input type="text" name="mes" placeholder="76-2-10 или 6509 и др." id="mes" required></h5>
+                    <br>
+                    <br>
+                    <input type="submit" value="Проверить" class="btn btn-primary">
+
+                </form>
+
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-3 alert alert-success">
+
+                <h2>СТАНДАРТЫ ЛЛО:</h2>
+                <a href="{% url 'llo' %}" class="btn btn-primary"> Содержание </a>
+
+            </div>
+          </div>
+        </div>
+      </div>
 
 </div>
 
 <br>
-<div>Приложение работает в тестовом режиме!</div>
-<div>Если найдете ошибки, пожалуйста напишите сюда: it-ural5@mail.ru</div>
+<div style="margin: 20px;">
+  Приложение работает в тестовом режиме!
+  <br>
+  Если найдете ошибки, пожалуйста напишите сюда: it-ural5@mail.ru
+  <br>
+  
+</div>
+
 </body>
